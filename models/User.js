@@ -6,6 +6,7 @@ const UserSchema = new mongoose.Schema({
     name:{
         type:String,
         required:[true,'Please provide a name'],
+        unique:true
     },
     email:{
         type:String,
@@ -13,7 +14,9 @@ const UserSchema = new mongoose.Schema({
         match:[/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
                'Please provide email'
          ], 
-         minlength:5
+         minlength:5,
+         unique:true
+
     },
     password:{
         type:String,
@@ -31,4 +34,10 @@ UserSchema.methods.createJWT = function (){
     return jwt.sign({userId:this._id,name:this.name},process.env.JWT_ENCRYPTION,{expiresIn:process.env.JWT_LIFETIME});
 };
 
-module.exports = mongoose.model('Users',UserSchema);
+UserSchema.methods.comparePass = async function (candiatedPassword){
+    const isMatch = await bcrypt.compare(candiatedPassword,this.password);
+    return isMatch;
+}
+
+
+module.exports = mongoose.model('User',UserSchema);
