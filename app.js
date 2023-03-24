@@ -2,12 +2,14 @@ require('dotenv').config();
 
 const express = require('express');
 const app = express();
-
+const notFound = require('./middleware/notFound')
+const errorHandler = require('./middleware/errorHandler')
 const connectDB = require('./db/connectDB');
 const PORT = process.env.PORT || 5000;
 
 
-const authRouter = require('./routes/auth')
+const authRouter = require('./routes/auth');
+const postsRouter = require('./routes/post');
 
 app.use(express.json());
 
@@ -16,7 +18,11 @@ app.get('/',(req,res)=>{
 })
 
 app.use('/auth',authRouter);
+app.use('/posts',postsRouter);
 
+app.use(notFound);
+
+app.use(errorHandler);
 
 const start = async () => {
     try{

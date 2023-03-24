@@ -1,5 +1,7 @@
 const User = require('../models/User');
 
+const {BadRequest,Unauthenticated}=require('../errors/index');
+
 const register = async (req,res)=>{
 
     const user = await User.create(req.body);
@@ -8,25 +10,31 @@ const register = async (req,res)=>{
 }
 
 
-const login = async (req,res)=>{
-    const {email,password}=req.body;
+const login = async (req,res,next)=>{
 
-    if(!email || !password)
-        throw new Error('Bad Request');
+    try{
+        const {email,password}=req.body;
 
-    const user = await User.findOne({email});
+        if(!email || !password)
+           throw new BadRequest('Bad Request');
+        
+           const user = await User.findOne({email});
 
-    if(!user)
-        throw new Error('Invalid credintials');
+        if(!user)
+            throw new Unauthenticated('Invalid credentials');
+        
+        const isMatch = await user.comparePass(password);
     
-    const isMatch = user.comparePass(password);
-
-    if(!isMatch)
-        throw new Error('Invalid credentials');
+        if(!isMatch)
+            throw new Unauthenticated('Invalid credentials');
+        
+        const token = user.createJWT();
+        
+        res.status(200).json({name:user.name,token});
+    }catch(err){
+        next(err);
+    }
     
-    const token = user.createJWT();
-    
-    res.status(200).json({name:user.name,token});
 }
 
 module.exports = {register,login};
