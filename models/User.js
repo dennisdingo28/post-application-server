@@ -22,6 +22,10 @@ const UserSchema = new mongoose.Schema({
         type:String,
         required:[true,'Please provide a password'],
         minlength:5
+    },
+    agreeTerms:{
+        type:Boolean,
+        required:[true,'You must agree with terms and conditions in order to proceed']
     }
 });
 
