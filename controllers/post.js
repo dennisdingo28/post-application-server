@@ -10,7 +10,9 @@ const getAllPosts = async (req,res)=>{
 }
 
 const createPost = async (req,res)=>{
-
+    req.body.createdBy=req.user.userId
+    const post = await Post.create(req.body);
+    res.status(201).json({msg:"Post was successfully created"})
 }
 
 const updatePost = async (req,res)=>{
