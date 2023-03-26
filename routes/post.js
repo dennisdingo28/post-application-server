@@ -6,6 +6,6 @@ const authenticate = require('../middleware/authenticated');
 const {getAllPosts, createPost, updatePost, deletePost} = require('../controllers/post')
 
 router.route('/').get(getAllPosts).post(authenticate,createPost);
-router.route('/:id').patch(updatePost).delete(deletePost)
+router.route('/:postId').patch(authenticate,updatePost).delete(authenticate,deletePost)
 
 module.exports = router;
